@@ -54,15 +54,20 @@ export function CleaningCalendar() {
   const getDayAssignment = (date: Date): CleaningAssignment | undefined => {
     const dayOfWeek = getDay(date); // 0=domenica, 1=lunedì, 2=martedì, 5=venerdì, 6=sabato
     
+    // Calcola l'indice ciclico per le persone basato sul numero del giorno nell'anno
+    const dayOfYear = Math.floor((date.getTime() - new Date(date.getFullYear(), 0, 0).getTime()) / (1000 * 60 * 60 * 24));
+    const personIndex = dayOfYear % people.length;
+    const assignedPerson = people[personIndex];
+    
     switch (dayOfWeek) {
       case 1: // Lunedì
-        return { person: '', type: 'kitchen' };
+        return { person: assignedPerson, type: 'kitchen' };
       case 2: // Martedì  
-        return { person: '', type: 'bathroom' };
+        return { person: assignedPerson, type: 'bathroom' };
       case 5: // Venerdì
-        return { person: '', type: 'kitchen' };
+        return { person: assignedPerson, type: 'kitchen' };
       case 6: // Sabato
-        return { person: '', type: 'bathroom' };
+        return { person: assignedPerson, type: 'bathroom' };
       default:
         return undefined;
     }
@@ -133,8 +138,11 @@ export function CleaningCalendar() {
                     {format(date, 'd')}
                   </div>
                   {assignment && (
-                    <div className="flex-1 flex items-center justify-center">
-                      <div className="text-xs font-medium text-foreground text-center">
+                    <div className="flex-1 flex flex-col items-center justify-center text-center">
+                      <div className="text-xs font-bold text-foreground">
+                        {assignment.person}
+                      </div>
+                      <div className="text-xs font-medium text-foreground mt-0.5">
                         {cleaningTypeLabels[assignment.type]}
                       </div>
                     </div>
