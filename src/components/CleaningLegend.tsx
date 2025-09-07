@@ -3,15 +3,11 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Palette, Users } from 'lucide-react';
 
 const cleaningTypes = [
-  { type: 'kitchen', label: 'Cucina', color: 'bg-cleaning-kitchen' },
-  { type: 'bathroom', label: 'Bagno', color: 'bg-cleaning-bathroom' },
-  { type: 'bedroom', label: 'Camere', color: 'bg-cleaning-bedroom' },
-  { type: 'livingroom', label: 'Salotto', color: 'bg-cleaning-livingroom' },
-  { type: 'general', label: 'Pulizia Generale', color: 'bg-cleaning-general' },
-  { type: 'windows', label: 'Finestre', color: 'bg-cleaning-windows' },
+  { type: 'kitchen', label: 'KITCHEN', color: 'bg-cleaning-kitchen' },
+  { type: 'bathroom', label: 'BATHROOM', color: 'bg-cleaning-bathroom' },
 ];
 
-const people = ['Marco', 'Laura', 'Andrea', 'Sofia'];
+const people = ['Giacomo', 'Marco', 'Franci'];
 
 export function CleaningLegend() {
   return (

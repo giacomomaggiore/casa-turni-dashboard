@@ -5,7 +5,7 @@ import { ChevronLeft, ChevronRight, Calendar, Users } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
 
-type CleaningType = 'kitchen' | 'bathroom' | 'bedroom' | 'livingroom' | 'general' | 'windows';
+type CleaningType = 'kitchen' | 'bathroom';
 
 interface CleaningAssignment {
   person: string;
@@ -18,39 +18,17 @@ interface CleaningDay {
 }
 
 const cleaningTypeLabels: Record<CleaningType, string> = {
-  kitchen: 'Cucina',
-  bathroom: 'Bagno',
-  bedroom: 'Camere',
-  livingroom: 'Salotto',
-  general: 'Generale',
-  windows: 'Finestre'
+  kitchen: 'KITCHEN',
+  bathroom: 'BATHROOM'
 };
 
 const cleaningTypeColors: Record<CleaningType, string> = {
   kitchen: 'bg-cleaning-kitchen',
-  bathroom: 'bg-cleaning-bathroom',
-  bedroom: 'bg-cleaning-bedroom',
-  livingroom: 'bg-cleaning-livingroom',
-  general: 'bg-cleaning-general',
-  windows: 'bg-cleaning-windows'
+  bathroom: 'bg-cleaning-bathroom'
 };
 
-// Dati di esempio per i turni
-const sampleAssignments: Record<string, CleaningAssignment> = {
-  '2025-01-01': { person: 'Marco', type: 'general' },
-  '2025-01-03': { person: 'Laura', type: 'kitchen' },
-  '2025-01-05': { person: 'Andrea', type: 'bathroom' },
-  '2025-01-07': { person: 'Sofia', type: 'bedroom' },
-  '2025-01-10': { person: 'Marco', type: 'livingroom' },
-  '2025-01-12': { person: 'Laura', type: 'windows' },
-  '2025-01-15': { person: 'Andrea', type: 'kitchen' },
-  '2025-01-17': { person: 'Sofia', type: 'bathroom' },
-  '2025-01-20': { person: 'Marco', type: 'bedroom' },
-  '2025-01-22': { person: 'Laura', type: 'general' },
-  '2025-01-25': { person: 'Andrea', type: 'livingroom' },
-  '2025-01-27': { person: 'Sofia', type: 'windows' },
-  '2025-01-30': { person: 'Marco', type: 'kitchen' },
-};
+const people = ['Giacomo', 'Marco', 'Franci'];
+const cleaningTypes: CleaningType[] = ['kitchen', 'bathroom'];
 
 const weekDays = ['Lun', 'Mar', 'Mer', 'Gio', 'Ven', 'Sab', 'Dom'];
 
@@ -74,8 +52,18 @@ export function CleaningCalendar() {
   };
 
   const getDayAssignment = (date: Date): CleaningAssignment | undefined => {
-    const dateKey = format(date, 'yyyy-MM-dd');
-    return sampleAssignments[dateKey];
+    const dayOfMonth = date.getDate();
+    
+    // Calcola l'indice ciclico per le persone (3 persone)
+    const personIndex = (dayOfMonth - 1) % people.length;
+    
+    // Calcola l'indice ciclico per i tipi di pulizia (2 tipi)
+    const typeIndex = (dayOfMonth - 1) % cleaningTypes.length;
+    
+    return {
+      person: people[personIndex],
+      type: cleaningTypes[typeIndex]
+    };
   };
 
   return (
