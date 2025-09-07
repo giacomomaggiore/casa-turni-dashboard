@@ -52,18 +52,20 @@ export function CleaningCalendar() {
   };
 
   const getDayAssignment = (date: Date): CleaningAssignment | undefined => {
-    const dayOfMonth = date.getDate();
+    const dayOfWeek = getDay(date); // 0=domenica, 1=lunedì, 2=martedì, 5=venerdì, 6=sabato
     
-    // Calcola l'indice ciclico per le persone (3 persone)
-    const personIndex = (dayOfMonth - 1) % people.length;
-    
-    // Calcola l'indice ciclico per i tipi di pulizia (2 tipi)
-    const typeIndex = (dayOfMonth - 1) % cleaningTypes.length;
-    
-    return {
-      person: people[personIndex],
-      type: cleaningTypes[typeIndex]
-    };
+    switch (dayOfWeek) {
+      case 1: // Lunedì
+        return { person: '', type: 'kitchen' };
+      case 2: // Martedì  
+        return { person: '', type: 'bathroom' };
+      case 5: // Venerdì
+        return { person: '', type: 'kitchen' };
+      case 6: // Sabato
+        return { person: '', type: 'bathroom' };
+      default:
+        return undefined;
+    }
   };
 
   return (
@@ -120,10 +122,10 @@ export function CleaningCalendar() {
               <div
                 key={format(date, 'yyyy-MM-dd')}
                 className={`
-                  h-20 border rounded-lg p-1 transition-all duration-200 hover:shadow-md
+                  h-20 border rounded-lg p-2 transition-all duration-200
                   ${isCurrentMonth ? 'bg-card' : 'bg-muted/20'}
                   ${isTodayDate ? 'ring-2 ring-primary ring-offset-2' : ''}
-                  ${assignment ? cleaningTypeColors[assignment.type] + '/10 border-' + assignment.type.replace('cleaning-', '') : ''}
+                  ${assignment ? cleaningTypeColors[assignment.type] : ''}
                 `}
               >
                 <div className="flex flex-col h-full">
@@ -131,14 +133,8 @@ export function CleaningCalendar() {
                     {format(date, 'd')}
                   </div>
                   {assignment && (
-                    <div className="flex-1 flex flex-col justify-center items-center text-center">
-                      <div className={`
-                        w-full px-1 py-0.5 rounded text-xs font-medium text-white
-                        ${cleaningTypeColors[assignment.type]}
-                      `}>
-                        {assignment.person}
-                      </div>
-                      <div className="text-xs text-muted-foreground mt-0.5">
+                    <div className="flex-1 flex items-center justify-center">
+                      <div className="text-xs font-medium text-foreground text-center">
                         {cleaningTypeLabels[assignment.type]}
                       </div>
                     </div>

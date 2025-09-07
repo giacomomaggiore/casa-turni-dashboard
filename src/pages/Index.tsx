@@ -1,15 +1,16 @@
-import { DashboardHeader } from '@/components/DashboardHeader';
 import { CleaningCalendar } from '@/components/CleaningCalendar';
-import { CleaningLegend } from '@/components/CleaningLegend';
 
 const Index = () => {
   return (
     <div className="min-h-screen bg-background">
-      <DashboardHeader />
+      <header className="py-8">
+        <div className="container mx-auto px-4">
+          <h1 className="text-3xl font-bold text-center text-foreground">Dashboard Pulizie Casa</h1>
+        </div>
+      </header>
       
-      <main className="container mx-auto px-4 py-8 space-y-8">
+      <main className="container mx-auto px-4 pb-8">
         <CleaningCalendar />
-        <CleaningLegend />
       </main>
     </div>
   );
