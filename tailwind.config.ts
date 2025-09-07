@@ -47,6 +47,14 @@ export default {
           DEFAULT: "hsl(var(--card))",
           foreground: "hsl(var(--card-foreground))",
         },
+        cleaning: {
+          kitchen: "hsl(var(--cleaning-kitchen))",
+          bathroom: "hsl(var(--cleaning-bathroom))",
+          bedroom: "hsl(var(--cleaning-bedroom))",
+          livingroom: "hsl(var(--cleaning-livingroom))",
+          general: "hsl(var(--cleaning-general))",
+          windows: "hsl(var(--cleaning-windows))",
+        },
         sidebar: {
           DEFAULT: "hsl(var(--sidebar-background))",
           foreground: "hsl(var(--sidebar-foreground))",
