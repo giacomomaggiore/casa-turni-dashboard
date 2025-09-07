@@ -1,18 +1,40 @@
-import { CleaningCalendar } from '@/components/CleaningCalendar';
+import { useState } from 'react';
+import { InteractiveCleaningCalendar } from '@/components/InteractiveCleaningCalendar';
+import { DashboardSidebar } from '@/components/DashboardSidebar';
+import { CleaningProvider } from '@/contexts/CleaningContext';
 
 const Index = () => {
+  const [currentDate, setCurrentDate] = useState(new Date());
+
   return (
-    <div className="min-h-screen bg-background">
-      <header className="py-8">
-        <div className="container mx-auto px-4">
-          <h1 className="text-3xl font-bold text-center text-foreground">Zurlindenstrasse Cleanings</h1>
-        </div>
-      </header>
-      
-      <main className="container mx-auto px-4 pb-8">
-        <CleaningCalendar />
-      </main>
-    </div>
+    <CleaningProvider>
+      <div className="min-h-screen bg-background">
+        <header className="py-8">
+          <div className="container mx-auto px-4">
+            <h1 className="text-3xl font-bold text-center text-foreground">
+              Dashboard Turni di Pulizia - Zurlindenstrasse
+            </h1>
+            <p className="text-center text-muted-foreground mt-2">
+              Gestisci e modifica i turni di pulizia in modo interattivo
+            </p>
+          </div>
+        </header>
+        
+        <main className="container mx-auto px-4 pb-8">
+          <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
+            {/* Sidebar */}
+            <div className="lg:col-span-1 order-2 lg:order-1">
+              <DashboardSidebar currentDate={currentDate} />
+            </div>
+            
+            {/* Main Calendar */}
+            <div className="lg:col-span-3 order-1 lg:order-2">
+              <InteractiveCleaningCalendar onDateChange={setCurrentDate} />
+            </div>
+          </div>
+        </main>
+      </div>
+    </CleaningProvider>
   );
 };
 
