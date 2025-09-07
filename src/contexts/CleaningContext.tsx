@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useReducer, useEffect, ReactNode } from 'react';
+import { createContext, useContext, useReducer, useEffect, ReactNode, useState } from 'react';
 import { format, getDay } from 'date-fns';
 import { v4 as uuidv4 } from 'uuid';
 
@@ -41,12 +41,13 @@ const cleaningReducer = (state: CleaningState, action: CleaningAction): Cleaning
     case 'SET_ASSIGNMENTS':
       return { assignments: action.payload };
     
-    case 'ADD_ASSIGNMENT':
+    case 'ADD_ASSIGNMENT': {
       const newAssignment: CleaningAssignment = {
         ...action.payload,
         id: uuidv4()
       };
       return { assignments: [...state.assignments, newAssignment] };
+    }
     
     case 'UPDATE_ASSIGNMENT':
       return {
@@ -141,29 +142,60 @@ interface CleaningProviderProps {
 
 export const CleaningProvider: React.FC<CleaningProviderProps> = ({ children }) => {
   const [state, dispatch] = useReducer(cleaningReducer, { assignments: [] });
+  const [isInitialLoad, setIsInitialLoad] = useState(true);
 
-  // Load from localStorage on mount
+  // Load from API on mount
   useEffect(() => {
-    const saved = localStorage.getItem('cleaning-assignments');
-    if (saved) {
+    const fetchAssignments = async () => {
       try {
-        const assignments = JSON.parse(saved);
-        dispatch({ type: 'SET_ASSIGNMENTS', payload: assignments });
+        const response = await fetch('/api/turni');
+        if (response.ok) {
+          const assignments = await response.json();
+          if (assignments && assignments.length > 0) {
+            dispatch({ type: 'SET_ASSIGNMENTS', payload: assignments });
+          } else {
+            // If the server returns an empty array, generate default assignments
+            dispatch({ type: 'RESET_TO_DEFAULT' });
+          }
+        } else {
+          // If the API fails, generate default assignments
+          console.error('Failed to load assignments from API');
+          dispatch({ type: 'RESET_TO_DEFAULT' });
+        }
       } catch (error) {
-        console.error('Failed to load assignments from localStorage:', error);
+        console.error('Failed to load assignments from API:', error);
         dispatch({ type: 'RESET_TO_DEFAULT' });
+      } finally {
+        setIsInitialLoad(false);
       }
-    } else {
-      dispatch({ type: 'RESET_TO_DEFAULT' });
-    }
+    };
+
+    fetchAssignments();
   }, []);
 
-  // Save to localStorage whenever assignments change
+  // Save to API whenever assignments change
   useEffect(() => {
-    if (state.assignments.length > 0) {
-      localStorage.setItem('cleaning-assignments', JSON.stringify(state.assignments));
+    // Avoid saving to API on the initial load or if assignments are empty
+    if (isInitialLoad || state.assignments.length === 0) {
+      return;
     }
-  }, [state.assignments]);
+
+    const saveAssignments = async () => {
+      try {
+        await fetch('/api/turni', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(state.assignments),
+        });
+      } catch (error) {
+        console.error('Failed to save assignments to API:', error);
+      }
+    };
+
+    saveAssignments();
+  }, [state.assignments, isInitialLoad]);
 
   const addAssignment = (assignment: Omit<CleaningAssignment, 'id'>) => {
     dispatch({ type: 'ADD_ASSIGNMENT', payload: assignment });

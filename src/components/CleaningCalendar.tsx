@@ -62,6 +62,7 @@ export function CleaningCalendar() {
       case 2: // Martedì
       case 5: // Venerdì
       case 6: // Sabato
+      {
         const assignedPerson = people[cleaningCounter % people.length]; // Assegna ciclicamente
         cleaningCounter++; // Incrementa il contatore solo nei giorni di pulizia
         if (dayOfWeek === 1 || dayOfWeek === 5) {
@@ -69,6 +70,7 @@ export function CleaningCalendar() {
         } else {
           return { person: assignedPerson, type: 'bathroom' };
         }
+      }
       default:
         return undefined; // Nessuna assegnazione per gli altri giorni
     }
