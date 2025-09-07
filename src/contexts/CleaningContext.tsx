@@ -1,6 +1,7 @@
-import React, { createContext, useContext, useReducer, useEffect, ReactNode } from 'react';
+import React, { createContext, useContext, useReducer, useEffect, ReactNode, useState } from 'react';
 import { format, getDay } from 'date-fns';
 import { v4 as uuidv4 } from 'uuid';
+import { apiService } from '@/services/api';
 
 export type CleaningType = 'kitchen' | 'bathroom';
 
@@ -12,16 +13,18 @@ export interface CleaningAssignment {
 }
 
 interface CleaningState {
-  assignments: CleaningAssignment[];
+  assignments: CleaningAssignment[] | null;
+  loading: boolean;
+  error: string | null;
 }
 
 type CleaningAction = 
   | { type: 'SET_ASSIGNMENTS'; payload: CleaningAssignment[] }
-  | { type: 'ADD_ASSIGNMENT'; payload: Omit<CleaningAssignment, 'id'> }
-  | { type: 'UPDATE_ASSIGNMENT'; payload: CleaningAssignment }
-  | { type: 'DELETE_ASSIGNMENT'; payload: string }
-  | { type: 'MOVE_ASSIGNMENT'; payload: { id: string; newDate: string } }
-  | { type: 'RESET_TO_DEFAULT' };
+  | { type: 'SET_LOADING'; payload: boolean }
+  | { type: 'SET_ERROR'; payload: string | null }
+  | { type: 'API_START' }
+  | { type: 'API_SUCCESS'; payload: CleaningAssignment[] }
+  | { type: 'API_ERROR'; payload: string };
 
 export const people = ['Giacomo', 'Marco', 'Franci'];
 export const cleaningTypes: CleaningType[] = ['kitchen', 'bathroom'];
@@ -39,38 +42,36 @@ export const cleaningTypeColors: Record<CleaningType, string> = {
 const cleaningReducer = (state: CleaningState, action: CleaningAction): CleaningState => {
   switch (action.type) {
     case 'SET_ASSIGNMENTS':
-      return { assignments: action.payload };
-    
-    case 'ADD_ASSIGNMENT':
-      const newAssignment: CleaningAssignment = {
-        ...action.payload,
-        id: uuidv4()
-      };
-      return { assignments: [...state.assignments, newAssignment] };
-    
-    case 'UPDATE_ASSIGNMENT':
-      return {
-        assignments: state.assignments.map(assignment =>
-          assignment.id === action.payload.id ? action.payload : assignment
-        )
+      return { 
+        ...state, 
+        assignments: action.payload,
+        loading: false,
+        error: null
       };
     
-    case 'DELETE_ASSIGNMENT':
-      return {
-        assignments: state.assignments.filter(assignment => assignment.id !== action.payload)
+    case 'SET_LOADING':
+      return { ...state, loading: action.payload };
+    
+    case 'SET_ERROR':
+      return { ...state, error: action.payload, loading: false };
+    
+    case 'API_START':
+      return { ...state, loading: true, error: null };
+    
+    case 'API_SUCCESS':
+      return { 
+        ...state, 
+        assignments: action.payload, 
+        loading: false, 
+        error: null 
       };
     
-    case 'MOVE_ASSIGNMENT':
-      return {
-        assignments: state.assignments.map(assignment =>
-          assignment.id === action.payload.id 
-            ? { ...assignment, date: action.payload.newDate }
-            : assignment
-        )
+    case 'API_ERROR':
+      return { 
+        ...state, 
+        loading: false, 
+        error: action.payload 
       };
-    
-    case 'RESET_TO_DEFAULT':
-      return { assignments: generateDefaultAssignments() };
     
     default:
       return state;
@@ -116,13 +117,16 @@ const generateDefaultAssignments = (): CleaningAssignment[] => {
 };
 
 interface CleaningContextType {
-  assignments: CleaningAssignment[];
-  addAssignment: (assignment: Omit<CleaningAssignment, 'id'>) => void;
-  updateAssignment: (assignment: CleaningAssignment) => void;
-  deleteAssignment: (id: string) => void;
-  moveAssignment: (id: string, newDate: string) => void;
-  resetToDefault: () => void;
+  assignments: CleaningAssignment[] | null;
+  loading: boolean;
+  error: string | null;
+  addAssignment: (assignment: Omit<CleaningAssignment, 'id'>) => Promise<void>;
+  updateAssignment: (assignment: CleaningAssignment) => Promise<void>;
+  deleteAssignment: (id: string) => Promise<void>;
+  moveAssignment: (id: string, newDate: string) => Promise<void>;
+  resetToDefault: () => Promise<void>;
   getAssignmentForDate: (date: string) => CleaningAssignment | undefined;
+  refreshAssignments: () => Promise<void>;
 }
 
 const CleaningContext = createContext<CleaningContextType | undefined>(undefined);
@@ -140,63 +144,97 @@ interface CleaningProviderProps {
 }
 
 export const CleaningProvider: React.FC<CleaningProviderProps> = ({ children }) => {
-  const [state, dispatch] = useReducer(cleaningReducer, { assignments: [] });
+  const [state, dispatch] = useReducer(cleaningReducer, { 
+    assignments: null as CleaningAssignment[] | null, 
+    loading: true, 
+    error: null 
+  });
 
-  // Load from localStorage on mount
+  // Load assignments from API on mount
   useEffect(() => {
-    const saved = localStorage.getItem('cleaning-assignments');
-    if (saved) {
-      try {
-        const assignments = JSON.parse(saved);
-        dispatch({ type: 'SET_ASSIGNMENTS', payload: assignments });
-      } catch (error) {
-        console.error('Failed to load assignments from localStorage:', error);
-        dispatch({ type: 'RESET_TO_DEFAULT' });
-      }
-    } else {
-      dispatch({ type: 'RESET_TO_DEFAULT' });
-    }
+    refreshAssignments();
   }, []);
 
-  // Save to localStorage whenever assignments change
-  useEffect(() => {
-    if (state.assignments.length > 0) {
-      localStorage.setItem('cleaning-assignments', JSON.stringify(state.assignments));
+  const refreshAssignments = async () => {
+    try {
+      dispatch({ type: 'API_START' });
+      const assignments = await apiService.getAllAssignments();
+      dispatch({ type: 'API_SUCCESS', payload: assignments });
+    } catch (error) {
+      dispatch({ type: 'API_ERROR', payload: error instanceof Error ? error.message : 'Failed to load assignments' });
     }
-  }, [state.assignments]);
-
-  const addAssignment = (assignment: Omit<CleaningAssignment, 'id'>) => {
-    dispatch({ type: 'ADD_ASSIGNMENT', payload: assignment });
   };
 
-  const updateAssignment = (assignment: CleaningAssignment) => {
-    dispatch({ type: 'UPDATE_ASSIGNMENT', payload: assignment });
+  const addAssignment = async (assignment: Omit<CleaningAssignment, 'id'>) => {
+    try {
+      dispatch({ type: 'API_START' });
+      const assignments = await apiService.addAssignment(assignment);
+      dispatch({ type: 'API_SUCCESS', payload: assignments });
+    } catch (error) {
+      dispatch({ type: 'API_ERROR', payload: error instanceof Error ? error.message : 'Failed to add assignment' });
+      throw error;
+    }
   };
 
-  const deleteAssignment = (id: string) => {
-    dispatch({ type: 'DELETE_ASSIGNMENT', payload: id });
+  const updateAssignment = async (assignment: CleaningAssignment) => {
+    try {
+      dispatch({ type: 'API_START' });
+      const assignments = await apiService.updateAssignment(assignment);
+      dispatch({ type: 'API_SUCCESS', payload: assignments });
+    } catch (error) {
+      dispatch({ type: 'API_ERROR', payload: error instanceof Error ? error.message : 'Failed to update assignment' });
+      throw error;
+    }
   };
 
-  const moveAssignment = (id: string, newDate: string) => {
-    dispatch({ type: 'MOVE_ASSIGNMENT', payload: { id, newDate } });
+  const deleteAssignment = async (id: string) => {
+    try {
+      dispatch({ type: 'API_START' });
+      const assignments = await apiService.deleteAssignment(id);
+      dispatch({ type: 'API_SUCCESS', payload: assignments });
+    } catch (error) {
+      dispatch({ type: 'API_ERROR', payload: error instanceof Error ? error.message : 'Failed to delete assignment' });
+      throw error;
+    }
   };
 
-  const resetToDefault = () => {
-    dispatch({ type: 'RESET_TO_DEFAULT' });
+  const moveAssignment = async (id: string, newDate: string) => {
+    try {
+      dispatch({ type: 'API_START' });
+      const assignments = await apiService.moveAssignment(id, newDate);
+      dispatch({ type: 'API_SUCCESS', payload: assignments });
+    } catch (error) {
+      dispatch({ type: 'API_ERROR', payload: error instanceof Error ? error.message : 'Failed to move assignment' });
+      throw error;
+    }
+  };
+
+  const resetToDefault = async () => {
+    try {
+      dispatch({ type: 'API_START' });
+      const assignments = await apiService.resetToDefault();
+      dispatch({ type: 'API_SUCCESS', payload: assignments });
+    } catch (error) {
+      dispatch({ type: 'API_ERROR', payload: error instanceof Error ? error.message : 'Failed to reset assignments' });
+      throw error;
+    }
   };
 
   const getAssignmentForDate = (date: string): CleaningAssignment | undefined => {
-    return state.assignments.find(assignment => assignment.date === date);
+    return state.assignments?.find(assignment => assignment.date === date);
   };
 
   const contextValue: CleaningContextType = {
     assignments: state.assignments,
+    loading: state.loading,
+    error: state.error,
     addAssignment,
     updateAssignment,
     deleteAssignment,
     moveAssignment,
     resetToDefault,
-    getAssignmentForDate
+    getAssignmentForDate,
+    refreshAssignments
   };
 
   return (

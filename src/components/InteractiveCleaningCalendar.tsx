@@ -24,8 +24,25 @@ export function InteractiveCleaningCalendar({ onDateChange }: InteractiveCleanin
     moveAssignment, 
     deleteAssignment, 
     updateAssignment,
-    addAssignment 
+    addAssignment,
+    loading,
+    error,
+    assignments
   } = useCleaningContext();
+
+  // Don't render calendar until assignments are loaded
+  if (!assignments) {
+    return (
+      <Card className="w-full">
+        <CardContent className="flex items-center justify-center p-8">
+          <div className="flex items-center gap-2">
+            <div className="h-4 w-4 animate-spin rounded-full border-2 border-primary border-t-transparent" />
+            <span className="text-sm">Caricamento calendario...</span>
+          </div>
+        </CardContent>
+      </Card>
+    );
+  }
 
   const monthStart = startOfMonth(currentDate);
   const monthEnd = endOfMonth(currentDate);
@@ -47,23 +64,31 @@ export function InteractiveCleaningCalendar({ onDateChange }: InteractiveCleanin
     onDateChange?.(newDate);
   };
 
-  const handleDragEnd = (result: DropResult) => {
+  const handleDragEnd = async (result: DropResult) => {
     const { destination, source, draggableId } = result;
 
     if (!destination) return;
     if (destination.droppableId === source.droppableId) return;
 
-    // Move assignment to new date
-    moveAssignment(draggableId, destination.droppableId);
+    try {
+      // Move assignment to new date
+      await moveAssignment(draggableId, destination.droppableId);
+    } catch (error) {
+      console.error('Failed to move assignment:', error);
+    }
   };
 
   const handleEditAssignment = (assignment: CleaningAssignment) => {
     setEditingAssignment(assignment);
   };
 
-  const handleDeleteAssignment = (assignment: CleaningAssignment) => {
+  const handleDeleteAssignment = async (assignment: CleaningAssignment) => {
     if (window.confirm(`Sei sicuro di voler eliminare l'assegnazione di ${assignment.person} per ${cleaningTypeLabels[assignment.type]}?`)) {
-      deleteAssignment(assignment.id);
+      try {
+        await deleteAssignment(assignment.id);
+      } catch (error) {
+        console.error('Failed to delete assignment:', error);
+      }
     }
   };
 
@@ -71,19 +96,41 @@ export function InteractiveCleaningCalendar({ onDateChange }: InteractiveCleanin
     setAddingToDate(date);
   };
 
-  const handleSaveEdit = (updatedAssignment: CleaningAssignment) => {
-    updateAssignment(updatedAssignment);
-    setEditingAssignment(null);
+  const handleSaveEdit = async (updatedAssignment: CleaningAssignment) => {
+    try {
+      await updateAssignment(updatedAssignment);
+      setEditingAssignment(null);
+    } catch (error) {
+      console.error('Failed to update assignment:', error);
+    }
   };
 
-  const handleSaveAdd = (newAssignment: { person: string; type: 'kitchen' | 'bathroom'; date: string }) => {
-    addAssignment(newAssignment);
-    setAddingToDate(null);
+  const handleSaveAdd = async (newAssignment: { person: string; type: 'kitchen' | 'bathroom'; date: string }) => {
+    try {
+      await addAssignment(newAssignment);
+      setAddingToDate(null);
+    } catch (error) {
+      console.error('Failed to add assignment:', error);
+    }
   };
 
   return (
     <>
-      <Card className="w-full">
+      <Card className="w-full relative">
+        {loading && (
+          <div className="absolute inset-0 bg-background/80 backdrop-blur-sm z-10 flex items-center justify-center">
+            <div className="flex items-center gap-2">
+              <div className="h-4 w-4 animate-spin rounded-full border-2 border-primary border-t-transparent" />
+              <span className="text-sm">Caricamento...</span>
+            </div>
+          </div>
+        )}
+        
+        {error && (
+          <div className="mb-4 p-3 bg-destructive/10 border border-destructive/20 rounded-lg">
+            <p className="text-sm text-destructive">{error}</p>
+          </div>
+        )}
         <CardHeader>
           <div className="flex items-center justify-between">
             <CardTitle className="text-2xl font-bold">

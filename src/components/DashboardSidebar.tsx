@@ -25,16 +25,27 @@ interface DashboardSidebarProps {
 }
 
 export function DashboardSidebar({ currentDate }: DashboardSidebarProps) {
-  const { assignments, resetToDefault } = useCleaningContext();
+  const { assignments, resetToDefault, loading } = useCleaningContext();
+
+  // Don't render until assignments are loaded
+  if (!assignments) {
+    return (
+      <div className="space-y-6">
+        <div className="flex items-center justify-center p-8">
+          <div className="h-4 w-4 animate-spin rounded-full border-2 border-primary border-t-transparent" />
+        </div>
+      </div>
+    );
+  }
 
   // Calculate statistics for current month
   const monthStart = startOfMonth(currentDate);
   const monthEnd = endOfMonth(currentDate);
   
-  const currentMonthAssignments = assignments.filter(assignment => {
+  const currentMonthAssignments = assignments?.filter(assignment => {
     const assignmentDate = new Date(assignment.date);
     return isWithinInterval(assignmentDate, { start: monthStart, end: monthEnd });
-  });
+  }) || [];
 
   const assignmentsByPerson = people.map(person => ({
     person,
@@ -47,9 +58,13 @@ export function DashboardSidebar({ currentDate }: DashboardSidebarProps) {
   const averagePerPerson = totalAssignments / people.length;
   const isBalanced = assignmentsByPerson.every(p => Math.abs(p.count - averagePerPerson) <= 1);
 
-  const handleResetToDefault = () => {
+  const handleResetToDefault = async () => {
     if (window.confirm('Sei sicuro di voler ripristinare le assegnazioni predefinite? Tutte le modifiche andranno perse.')) {
-      resetToDefault();
+      try {
+        await resetToDefault();
+      } catch (error) {
+        console.error('Failed to reset assignments:', error);
+      }
     }
   };
 
