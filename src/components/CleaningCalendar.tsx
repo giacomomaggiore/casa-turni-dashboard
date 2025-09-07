@@ -51,25 +51,26 @@ export function CleaningCalendar() {
     setCurrentDate(new Date(currentDate.getFullYear(), currentDate.getMonth() + 1));
   };
 
+  let cleaningCounter = 0; // Contatore globale per l'assegnazione ciclica delle persone
+
   const getDayAssignment = (date: Date): CleaningAssignment | undefined => {
-    const dayOfWeek = getDay(date); // 0=domenica, 1=lunedì, 2=martedì, 5=venerdì, 6=sabato
-    
-    // Calcola l'indice ciclico per le persone basato sul numero del giorno nell'anno
-    const dayOfYear = Math.floor((date.getTime() - new Date(date.getFullYear(), 0, 0).getTime()) / (1000 * 60 * 60 * 24));
-    const personIndex = dayOfYear % people.length;
-    const assignedPerson = people[personIndex];
-    
+    const dayOfWeek = getDay(date); // 0=domenica, 1=lunedì, 2=martedì, ..., 6=sabato
+  
+    // Assegna solo per i giorni specifici (lunedì, martedì, venerdì, sabato)
     switch (dayOfWeek) {
       case 1: // Lunedì
-        return { person: assignedPerson, type: 'kitchen' };
-      case 2: // Martedì  
-        return { person: assignedPerson, type: 'bathroom' };
+      case 2: // Martedì
       case 5: // Venerdì
-        return { person: assignedPerson, type: 'kitchen' };
       case 6: // Sabato
-        return { person: assignedPerson, type: 'bathroom' };
+        const assignedPerson = people[cleaningCounter % people.length]; // Assegna ciclicamente
+        cleaningCounter++; // Incrementa il contatore solo nei giorni di pulizia
+        if (dayOfWeek === 1 || dayOfWeek === 5) {
+          return { person: assignedPerson, type: 'kitchen' };
+        } else {
+          return { person: assignedPerson, type: 'bathroom' };
+        }
       default:
-        return undefined;
+        return undefined; // Nessuna assegnazione per gli altri giorni
     }
   };
 

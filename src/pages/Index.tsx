@@ -5,7 +5,7 @@ const Index = () => {
     <div className="min-h-screen bg-background">
       <header className="py-8">
         <div className="container mx-auto px-4">
-          <h1 className="text-3xl font-bold text-center text-foreground">Dashboard Pulizie Casa</h1>
+          <h1 className="text-3xl font-bold text-center text-foreground">Zurlindenstrasse Cleanings</h1>
         </div>
       </header>
       
