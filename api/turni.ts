@@ -1,7 +1,7 @@
+import { kv } from '@vercel/kv';
 import type { VercelRequest, VercelResponse } from '@vercel/node';
-import { put, list, del } from '@vercel/blob';
 
-const FILENAME = 'turni.json';
+const KEY = 'turni';
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
   if (req.method === 'POST') {
@@ -11,47 +11,24 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         return res.status(400).json({ message: 'Invalid data format. Expected an array.' });
       }
 
-      // Find and delete the old blob to "overwrite" it.
-      const { blobs } = await list({ prefix: FILENAME });
-      if (blobs.length > 0) {
-        await del(blobs[0].url);
-      }
+      await kv.set(KEY, assignments);
 
-      const { url } = await put(FILENAME, JSON.stringify(assignments, null, 2), {
-        access: 'public',
-        contentType: 'application/json',
-        cacheControlMaxAge: 0,
-      });
-
-      return res.status(200).json({ message: 'Assignments saved successfully.', url });
+      return res.status(200).json({ message: 'Assignments saved successfully.' });
     } catch (error) {
-      console.error('Error saving assignments:', error);
+      console.error('Error saving assignments to KV store:', error);
       return res.status(500).json({ message: 'Internal Server Error' });
     }
   }
 
   if (req.method === 'GET') {
     try {
-      const { blobs } = await list({ prefix: FILENAME });
+      const assignments = await kv.get(KEY);
 
-      if (blobs.length === 0) {
-        return res.status(200).json([]);
-      }
-
-      const turniBlob = blobs[0];
-      const response = await fetch(turniBlob.url);
-
-      if (!response.ok) {
-        // If the fetch fails, it might be an old, deleted blob. Return empty.
-        console.error(`Failed to fetch blob from ${turniBlob.url}`, { status: response.status });
-        return res.status(200).json([]);
-      }
-
-      const data = await response.json();
-
-      return res.status(200).json(data);
+      // If the key doesn't exist, kv.get returns null.
+      // We'll return an empty array in that case, which the frontend expects.
+      return res.status(200).json(assignments || []);
     } catch (error) {
-      console.error('Error fetching assignments:', error);
+      console.error('Error fetching assignments from KV store:', error);
       return res.status(500).json({ message: 'Internal Server Error' });
     }
   }
