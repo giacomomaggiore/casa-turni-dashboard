@@ -172,19 +172,19 @@ export function DashboardSidebar({ currentDate }: DashboardSidebarProps) {
         </CardContent>
       </Card>
 
-      {/* Instructions */}
-      <Card>
-        <CardHeader className="pb-3">
-          <CardTitle className="text-lg">Come usare</CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-2 text-sm text-muted-foreground">
-          <p>• <strong>Trascina</strong> le assegnazioni per spostarle</p>
-          <p>• <strong>Hover</strong> su un'assegnazione per vedere i pulsanti</p>
-          <p>• <strong>Clicca +</strong> sui giorni vuoti per aggiungere</p>
-          <p>• <strong>Clicca edit</strong> per modificare persona/tipo</p>
-          <p>• <strong>Clicca trash</strong> per eliminare</p>
-        </CardContent>
-      </Card>
+      {/* Instructions - Hidden on mobile */}
+      <div className="hidden lg:block">
+        <Card>
+          <CardHeader className="pb-3">
+            <CardTitle className="text-lg">Come usare (Desktop)</CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-2 text-sm text-muted-foreground">
+            <p>• <strong>Trascina</strong> un turno per spostarlo di data.</p>
+            <p>• <strong>Passa il mouse</strong> su un turno per vedere le opzioni di modifica ed eliminazione.</p>
+            <p>• <strong>Clicca il +</strong> su un giorno vuoto per aggiungere un nuovo turno.</p>
+          </CardContent>
+        </Card>
+      </div>
     </div>
   );
 } 

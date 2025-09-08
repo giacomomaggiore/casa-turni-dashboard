@@ -11,7 +11,7 @@ const Index = () => {
       <div className="min-h-screen bg-background">
         <header className="py-8">
           <div className="container mx-auto px-4">
-            <h1 className="text-3xl font-bold text-center text-foreground">
+            <h1 className="text-2xl md:text-3xl font-bold text-center text-foreground">
               Dashboard Turni di Pulizia - Zurlindenstrasse
             </h1>
             <p className="text-center text-muted-foreground mt-2">
