@@ -110,13 +110,13 @@ export function MobileCalendarView({
                                 {...provided.draggableProps}
                                 {...provided.dragHandleProps}
                                 className={`
-                                  w-full p-2 rounded-md shadow-sm text-center group cursor-move
+                                  w-full p-2 rounded-md shadow-sm text-center relative cursor-move
                                   ${snapshot.isDragging ? 'opacity-60' : ''}
                                 `}
                               >
                                 <div className="font-bold text-sm text-black">{assignment.person}</div>
                                 <div className="text-xs text-black">{cleaningTypeLabels[assignment.type]}</div>
-                                <div className="absolute top-1 right-1 opacity-0 group-hover:opacity-100 flex gap-1">
+                                <div className="absolute top-1 right-1 flex gap-1">
                                    <Button
                                     variant="ghost"
                                     size="icon"
