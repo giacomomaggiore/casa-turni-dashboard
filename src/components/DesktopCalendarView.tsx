@@ -4,7 +4,7 @@ import { DragDropContext, Droppable, Draggable, DropResult } from '@hello-pangea
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { ChevronLeft, ChevronRight, Edit, Trash2, Plus } from 'lucide-react';
-import { useCleaningContext, CleaningAssignment, cleaningTypeLabels, cleaningTypeColors, personColors } from '@/contexts/CleaningContext';
+import { useCleaningContext, CleaningAssignment, cleaningTypeLabels, personColors } from '@/contexts/CleaningContext';
 
 const weekDays = ['Lun', 'Mar', 'Mer', 'Gio', 'Ven', 'Sab', 'Dom'];
 
