@@ -126,10 +126,10 @@ interface CleaningContextType {
   assignments: CleaningAssignment[];
   addAssignment: (assignment: Omit<CleaningAssignment, 'id'>) => void;
   updateAssignment: (assignment: CleaningAssignment) => void;
-  deleteAssignment: (id: string) => void;
+  deleteAssignment: (id:string) => void;
   moveAssignment: (id: string, newDate: string) => void;
   resetToDefault: () => void;
-  getAssignmentForDate: (date: string) => CleaningAssignment | undefined;
+  getAssignmentsForDate: (date: string) => CleaningAssignment[];
 }
 
 const CleaningContext = createContext<CleaningContextType | undefined>(undefined);
@@ -223,8 +223,8 @@ export const CleaningProvider: React.FC<CleaningProviderProps> = ({ children }) 
     dispatch({ type: 'RESET_TO_DEFAULT' });
   };
 
-  const getAssignmentForDate = (date: string): CleaningAssignment | undefined => {
-    return state.assignments.find(assignment => assignment.date === date);
+  const getAssignmentsForDate = (date: string): CleaningAssignment[] => {
+    return state.assignments.filter(assignment => assignment.date === date);
   };
 
   const contextValue: CleaningContextType = {
@@ -234,7 +234,7 @@ export const CleaningProvider: React.FC<CleaningProviderProps> = ({ children }) 
     deleteAssignment,
     moveAssignment,
     resetToDefault,
-    getAssignmentForDate
+    getAssignmentsForDate
   };
 
   return (

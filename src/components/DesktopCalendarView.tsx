@@ -27,7 +27,7 @@ export function DesktopCalendarView({
   onAddAssignment,
   onMoveAssignment,
 }: DesktopCalendarViewProps) {
-  const { getAssignmentForDate } = useCleaningContext();
+  const { getAssignmentsForDate } = useCleaningContext();
 
   const monthStart = startOfMonth(currentDate);
   const monthEnd = endOfMonth(currentDate);
@@ -77,7 +77,7 @@ export function DesktopCalendarView({
             ))}
             {calendarDays.map((date) => {
               const dateString = format(date, 'yyyy-MM-dd');
-              const assignment = getAssignmentForDate(dateString);
+              const assignments = getAssignmentsForDate(dateString);
               const isCurrentMonth = isSameMonth(date, currentDate);
               const isTodayDate = isToday(date);
 
@@ -88,70 +88,68 @@ export function DesktopCalendarView({
                       ref={provided.innerRef}
                       {...provided.droppableProps}
                       className={`
-                        h-24 lg:h-28 border rounded-lg p-2 transition-all duration-200 relative
+                        h-32 lg:h-36 border rounded-lg p-2 transition-all duration-200 relative flex flex-col
                         ${isTodayDate ? 'ring-2 ring-primary ring-offset-2' : ''}
                         ${snapshot.isDraggingOver ? 'bg-primary/10 border-primary' : ''}
-                        ${assignment ? personColors[assignment.person] : (isCurrentMonth ? 'bg-card' : 'bg-muted/20')}
+                        ${isCurrentMonth ? 'bg-card' : 'bg-muted/20'}
                       `}
                     >
-                      <div className="flex flex-col h-full">
-                        <div className={`text-sm md:text-base font-medium ${isTodayDate ? 'text-primary' : 'text-black'}`}>
-                          {format(date, 'd')}
-                        </div>
+                      <div className={`text-sm md:text-base font-medium ${isTodayDate ? 'text-primary' : 'text-black'}`}>
+                        {format(date, 'd')}
+                      </div>
 
-                        {assignment ? (
-                          <Draggable draggableId={assignment.id} index={0}>
+                      <div className="flex-1 mt-1 grid grid-cols-2 gap-1">
+                        {assignments.map((assignment, index) => (
+                          <Draggable key={assignment.id} draggableId={assignment.id} index={index}>
                             {(provided, snapshot) => (
                               <div
                                 ref={provided.innerRef}
                                 {...provided.draggableProps}
                                 {...provided.dragHandleProps}
                                 className={`
-                                  flex-1 flex flex-col items-center justify-center text-center group cursor-move
-                                  ${snapshot.isDragging ? 'opacity-50' : ''}
+                                  p-1 rounded-md text-center group cursor-move text-xs
+                                  ${personColors[assignment.person]}
+                                  ${snapshot.isDragging ? 'opacity-60' : ''}
                                 `}
                               >
-                                <div className="text-xs font-bold text-black">
-                                  {assignment.person}
-                                </div>
-                                <div className="text-xs font-medium text-black mt-0.5">
-                                  {cleaningTypeLabels[assignment.type]}
-                                </div>
+                                <div className="font-bold text-black truncate">{assignment.person}</div>
+                                <div className="font-medium text-black truncate">{cleaningTypeLabels[assignment.type]}</div>
 
-                                <div className="absolute top-1 right-1 opacity-0 group-hover:opacity-100 group-focus:opacity-100 group-focus-within:opacity-100 transition-opacity flex gap-1">
+                                <div className="absolute top-0.5 right-0.5 opacity-0 group-hover:opacity-100 flex gap-0.5">
                                   <Button
                                     variant="ghost"
                                     size="icon"
-                                    className="h-5 w-5 bg-background/80 hover:bg-background"
+                                    className="h-4 w-4 bg-background/70 hover:bg-background"
                                     onClick={(e) => { e.stopPropagation(); onEditAssignment(assignment); }}
                                   >
-                                    <Edit className="h-3 w-3" />
+                                    <Edit className="h-2.5 w-2.5" />
                                   </Button>
                                   <Button
                                     variant="ghost"
                                     size="icon"
-                                    className="h-5 w-5 bg-background/80 hover:bg-destructive hover:text-destructive-foreground"
+                                    className="h-4 w-4 bg-background/70 hover:bg-destructive hover:text-destructive-foreground"
                                     onClick={(e) => { e.stopPropagation(); onDeleteAssignment(assignment); }}
                                   >
-                                    <Trash2 className="h-3 w-3" />
+                                    <Trash2 className="h-2.5 w-2.5" />
                                   </Button>
                                 </div>
                               </div>
                             )}
                           </Draggable>
-                        ) : (
-                          <div className="flex-1 flex items-center justify-center group">
-                            <Button
-                              variant="ghost"
-                              size="icon"
-                              className="h-8 w-8 opacity-0 group-hover:opacity-100 group-focus-within:opacity-100 transition-opacity"
-                              onClick={() => onAddAssignment(dateString)}
-                            >
-                              <Plus className="h-4 w-4" />
-                            </Button>
-                          </div>
-                        )}
+                        ))}
                       </div>
+
+                      <div className="absolute bottom-1 right-1">
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          className="h-6 w-6"
+                          onClick={() => onAddAssignment(dateString)}
+                        >
+                          <Plus className="h-4 w-4" />
+                        </Button>
+                      </div>
+
                       {provided.placeholder}
                     </div>
                   )}

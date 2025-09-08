@@ -16,8 +16,6 @@ interface MobileCalendarViewProps {
   onMoveAssignment: (id: string, newDate: string) => void;
 }
 
-const weekDays = ['Lun', 'Mar', 'Mer', 'Gio', 'Ven', 'Sab', 'Dom'];
-
 export function MobileCalendarView({
   currentDate,
   assignments,
@@ -37,7 +35,7 @@ export function MobileCalendarView({
       const dateString = format(day, 'yyyy-MM-dd');
       return {
         date: dateString,
-        assignment: assignments.find(a => a.date === dateString),
+        assignments: assignments.filter(a => a.date === dateString),
       };
     });
   }, [assignments, weekDaysInterval]);
@@ -81,7 +79,7 @@ export function MobileCalendarView({
             {weekDaysInterval.map((day, index) => {
               const dateString = format(day, 'yyyy-MM-dd');
               const dayData = weeklyAssignments[index];
-              const assignment = dayData ? dayData.assignment : undefined;
+              const dayAssignments = dayData ? dayData.assignments : [];
               const isTodayDate = isToday(day);
 
               return (
@@ -94,29 +92,32 @@ export function MobileCalendarView({
                         p-2 rounded-lg flex items-center gap-3 transition-all
                         ${isTodayDate ? 'ring-1 ring-primary' : ''}
                         ${snapshot.isDraggingOver ? 'bg-primary/10' : ''}
-                        ${assignment ? personColors[assignment.person] : 'bg-muted/30'}
+                        ${dayAssignments.length > 0 ? 'bg-card' : 'bg-muted/30'}
                       `}
                     >
                       <div className={`flex-none text-center w-10 ${isTodayDate ? 'text-primary' : 'text-black'}`}>
                         <div className="text-xs font-semibold">{format(day, 'eee', { locale: it })}</div>
                         <div className="text-lg font-bold">{format(day, 'd')}</div>
                       </div>
-                      <div className="flex-grow min-h-[4rem] flex items-center justify-center">
-                        {assignment ? (
-                          <Draggable draggableId={assignment.id} index={0}>
+                      <div className="flex-grow min-h-[4rem] flex flex-col justify-center gap-1">
+                        {dayAssignments.map((assignment, index) => (
+                          <Draggable key={assignment.id} draggableId={assignment.id} index={index}>
                             {(provided, snapshot) => (
                               <div
                                 ref={provided.innerRef}
                                 {...provided.draggableProps}
                                 {...provided.dragHandleProps}
                                 className={`
-                                  w-full p-2 rounded-md shadow-sm text-center relative cursor-move
+                                  w-full p-2 rounded-md shadow-sm text-center relative cursor-move flex items-center justify-between
+                                  ${personColors[assignment.person]}
                                   ${snapshot.isDragging ? 'opacity-60' : ''}
                                 `}
                               >
-                                <div className="font-bold text-sm text-black">{assignment.person}</div>
-                                <div className="text-xs text-black">{cleaningTypeLabels[assignment.type]}</div>
-                                <div className="absolute top-1 right-1 flex gap-1">
+                                <div>
+                                  <div className="font-bold text-sm text-black">{assignment.person}</div>
+                                  <div className="text-xs text-black">{cleaningTypeLabels[assignment.type]}</div>
+                                </div>
+                                <div className="flex gap-1">
                                    <Button
                                     variant="ghost"
                                     size="icon"
@@ -137,20 +138,19 @@ export function MobileCalendarView({
                               </div>
                             )}
                           </Draggable>
-                        ) : (
-                          <div className="flex-1 flex items-center justify-center group h-full">
-                            <Button
-                              variant="ghost"
-                              size="icon"
-                              className="h-8 w-8 opacity-50 group-hover:opacity-100 transition-opacity"
-                              onClick={() => onAddAssignment(dateString)}
-                            >
-                              <Plus className="h-4 w-4" />
-                            </Button>
-                          </div>
-                        )}
+                        ))}
                       </div>
-                       {provided.placeholder}
+                      <div className="flex-none">
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          className="h-8 w-8"
+                          onClick={() => onAddAssignment(dateString)}
+                        >
+                          <Plus className="h-4 w-4" />
+                        </Button>
+                      </div>
+                      {provided.placeholder}
                     </div>
                   )}
                 </Droppable>
