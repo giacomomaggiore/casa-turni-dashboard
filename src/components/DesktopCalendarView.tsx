@@ -98,7 +98,7 @@ export function DesktopCalendarView({
                         {format(date, 'd')}
                       </div>
 
-                      <div className="flex-1 mt-1 grid grid-cols-2 gap-1">
+                      <div className={`flex-1 mt-1 ${assignments.length > 1 ? 'grid grid-cols-2 gap-1' : 'flex'}`}>
                         {assignments.map((assignment, index) => (
                           <Draggable key={assignment.id} draggableId={assignment.id} index={index}>
                             {(provided, snapshot) => (
@@ -107,7 +107,9 @@ export function DesktopCalendarView({
                                 {...provided.draggableProps}
                                 {...provided.dragHandleProps}
                                 className={`
-                                  p-1 rounded-md text-center group cursor-move text-xs
+                                  ${assignments.length > 1 ? 'p-1 text-xs' : 'flex-1 flex-col items-center justify-center p-2'}
+                                  rounded-md text-center group cursor-move
+                                  relative
                                   ${personColors[assignment.person]}
                                   ${snapshot.isDragging ? 'opacity-60' : ''}
                                 `}
@@ -115,22 +117,24 @@ export function DesktopCalendarView({
                                 <div className="font-bold text-black truncate">{assignment.person}</div>
                                 <div className="font-medium text-black truncate">{cleaningTypeLabels[assignment.type]}</div>
 
-                                <div className="absolute top-0.5 right-0.5 opacity-0 group-hover:opacity-100 flex gap-0.5">
+                                <div className={`absolute top-0.5 right-0.5 opacity-0 group-hover:opacity-100 flex gap-0.5
+                                  ${assignments.length === 1 ? 'p-2' : ''}
+                                `}>
                                   <Button
                                     variant="ghost"
                                     size="icon"
-                                    className="h-4 w-4 bg-background/70 hover:bg-background"
+                                    className="h-5 w-5 bg-background/70 hover:bg-background"
                                     onClick={(e) => { e.stopPropagation(); onEditAssignment(assignment); }}
                                   >
-                                    <Edit className="h-2.5 w-2.5" />
+                                    <Edit className="h-3 w-3" />
                                   </Button>
                                   <Button
                                     variant="ghost"
                                     size="icon"
-                                    className="h-4 w-4 bg-background/70 hover:bg-destructive hover:text-destructive-foreground"
+                                    className="h-5 w-5 bg-background/70 hover:bg-destructive hover:text-destructive-foreground"
                                     onClick={(e) => { e.stopPropagation(); onDeleteAssignment(assignment); }}
                                   >
-                                    <Trash2 className="h-2.5 w-2.5" />
+                                    <Trash2 className="h-3 w-3" />
                                   </Button>
                                 </div>
                               </div>
