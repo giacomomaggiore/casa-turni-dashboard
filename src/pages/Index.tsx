@@ -12,10 +12,10 @@ const Index = () => {
         <header className="py-8">
           <div className="container mx-auto px-4">
             <h1 className="text-2xl md:text-3xl font-bold text-center text-foreground">
-              Dashboard Turni di Pulizia - Zurlindenstrasse
+              Zurlindenstrasse 3
             </h1>
             <p className="text-center text-muted-foreground mt-2">
-              Gestisci e modifica i turni di pulizia in modo interattivo
+              Made with ❤️ by <a href='https://jules.google/>' target='blank'> Jules </a>,<a href='https://www.linkedin.com/in/denegrimarco?originalSubdomain=it' target='blank'> Marco</a> & <a href='https://giacomomaggiore.com/' target='blank'>Giacomo</a>
             </p>
           </div>
         </header>
