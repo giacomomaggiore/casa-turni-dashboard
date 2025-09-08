@@ -21,14 +21,14 @@ const Index = () => {
         </header>
         
         <main className="container mx-auto px-4 pb-8">
-          <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
+          <div className="grid grid-cols-1 lg:flex lg:gap-6 lg:items-stretch">
             {/* Sidebar */}
-            <div className="lg:col-span-1 order-2 lg:order-1">
+            <div className="lg:w-1/4 order-2 lg:order-1">
               <DashboardSidebar currentDate={currentDate} />
             </div>
             
             {/* Main Calendar */}
-            <div className="lg:col-span-3 order-1 lg:order-2">
+            <div className="lg:w-3/4 order-1 lg:order-2">
               <InteractiveCleaningCalendar onDateChange={setCurrentDate} />
             </div>
           </div>

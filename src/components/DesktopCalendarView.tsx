@@ -45,7 +45,7 @@ export function DesktopCalendarView({
   };
 
   return (
-    <Card className="w-full hidden md:block">
+    <Card className="w-full hidden md:flex md:flex-col h-full">
       <CardHeader>
         <div className="flex items-center justify-between">
           <CardTitle className="text-2xl font-bold">
@@ -61,7 +61,7 @@ export function DesktopCalendarView({
           </div>
         </div>
       </CardHeader>
-      <CardContent>
+      <CardContent className="flex-1 flex flex-col">
         <div className="grid grid-cols-7 gap-1 mb-4">
           {weekDays.map((day) => (
             <div key={day} className="h-8 flex items-center justify-center text-sm font-medium text-muted-foreground">

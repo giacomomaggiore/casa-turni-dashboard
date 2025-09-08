@@ -54,7 +54,7 @@ export function DashboardSidebar({ currentDate }: DashboardSidebarProps) {
   };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 h-full flex flex-col">
       {/* Statistics */}
       <Card>
         <CardHeader className="pb-3">
