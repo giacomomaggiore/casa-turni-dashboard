@@ -1,17 +1,13 @@
 import React, { useState, useMemo } from 'react';
-import { format, startOfMonth, endOfMonth, eachDayOfInterval, getDay, isSameMonth, isToday } from 'date-fns';
-import { DragDropContext, Droppable, Draggable, DropResult } from '@hello-pangea/dnd';
+import { startOfMonth, endOfMonth } from 'date-fns';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { MobileCalendarView } from './MobileCalendarView';
 import { DesktopCalendarView } from './DesktopCalendarView';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { ChevronLeft, ChevronRight, Edit, Trash2, Plus } from 'lucide-react';
-import { useCleaningContext, CleaningAssignment, cleaningTypeLabels, cleaningTypeColors } from '@/contexts/CleaningContext';
+import { useCleaningContext, CleaningAssignment } from '@/contexts/CleaningContext';
 import { AssignmentEditDialog } from '@/components/AssignmentEditDialog';
 import { AddAssignmentDialog } from '@/components/AddAssignmentDialog';
-
-const weekDays = ['Lun', 'Mar', 'Mer', 'Gio', 'Ven', 'Sab', 'Dom'];
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import { TodoListView } from './TodoListView';
 
 interface InteractiveCleaningCalendarProps {
   onDateChange?: (date: Date) => void;
@@ -21,15 +17,15 @@ export function InteractiveCleaningCalendar({ onDateChange }: InteractiveCleanin
   const [currentDate, setCurrentDate] = useState(new Date());
   const [editingAssignment, setEditingAssignment] = useState<CleaningAssignment | null>(null);
   const [addingToDate, setAddingToDate] = useState<string | null>(null);
-  
+
   const isMobile = useIsMobile();
 
-  const { 
+  const {
     assignments,
-    moveAssignment, 
-    deleteAssignment, 
+    moveAssignment,
+    deleteAssignment,
     updateAssignment,
-    addAssignment 
+    addAssignment
   } = useCleaningContext();
 
   const monthlyAssignments = useMemo(() => {
@@ -79,28 +75,41 @@ export function InteractiveCleaningCalendar({ onDateChange }: InteractiveCleanin
 
   return (
     <>
-      {isMobile ? (
-        <MobileCalendarView
-          currentDate={currentDate}
-          assignments={monthlyAssignments}
-          onPreviousMonth={previousMonth}
-          onNextMonth={nextMonth}
-          onEditAssignment={handleEditAssignment}
-  onDeleteAssignment={handleDeleteAssignment}
-          onAddAssignment={handleAddAssignment}
-          onMoveAssignment={moveAssignment}
-        />
-      ) : (
-        <DesktopCalendarView
-          currentDate={currentDate}
-          onPreviousMonth={previousMonth}
-          onNextMonth={nextMonth}
-          onEditAssignment={handleEditAssignment}
-          onDeleteAssignment={handleDeleteAssignment}
-          onAddAssignment={handleAddAssignment}
-          onMoveAssignment={moveAssignment}
-        />
-      )}
+      <Tabs defaultValue="calendar" className="w-full">
+        <TabsList className="grid w-full grid-cols-2">
+          <TabsTrigger value="calendar">Calendario</TabsTrigger>
+          <TabsTrigger value="todolist">Lista Spesa</TabsTrigger>
+        </TabsList>
+        <TabsContent value="calendar">
+          {isMobile ? (
+            <MobileCalendarView
+              currentDate={currentDate}
+              assignments={monthlyAssignments}
+              onPreviousMonth={previousMonth}
+              onNextMonth={nextMonth}
+              onEditAssignment={handleEditAssignment}
+              onDeleteAssignment={handleDeleteAssignment}
+              onAddAssignment={handleAddAssignment}
+              onMoveAssignment={moveAssignment}
+            />
+          ) : (
+            <DesktopCalendarView
+              currentDate={currentDate}
+              onPreviousMonth={previousMonth}
+              onNextMonth={nextMonth}
+              onEditAssignment={handleEditAssignment}
+              onDeleteAssignment={handleDeleteAssignment}
+              onAddAssignment={handleAddAssignment}
+              onMoveAssignment={moveAssignment}
+            />
+          )}
+        </TabsContent>
+        <TabsContent value="todolist">
+          <TodoListView />
+        </TabsContent>
+      </Tabs>
+
+
 
       {/* Dialogs remain in the parent component to be shared */}
       {editingAssignment && (
