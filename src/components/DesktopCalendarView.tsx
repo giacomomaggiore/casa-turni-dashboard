@@ -4,7 +4,7 @@ import { DragDropContext, Droppable, Draggable, DropResult } from '@hello-pangea
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { ChevronLeft, ChevronRight, Edit, Trash2, Plus } from 'lucide-react';
-import { useCleaningContext, CleaningAssignment, cleaningTypeLabels, cleaningTypeColors } from '@/contexts/CleaningContext';
+import { useCleaningContext, CleaningAssignment, cleaningTypeLabels, cleaningTypeColors, personColors } from '@/contexts/CleaningContext';
 
 const weekDays = ['Lun', 'Mar', 'Mer', 'Gio', 'Ven', 'Sab', 'Dom'];
 
@@ -92,11 +92,11 @@ export function DesktopCalendarView({
                         ${isCurrentMonth ? 'bg-card' : 'bg-muted/20'}
                         ${isTodayDate ? 'ring-2 ring-primary ring-offset-2' : ''}
                         ${snapshot.isDraggingOver ? 'bg-primary/10 border-primary' : ''}
-                        ${assignment ? cleaningTypeColors[assignment.type] : ''}
+                        ${assignment ? personColors[assignment.person] : ''}
                       `}
                     >
                       <div className="flex flex-col h-full">
-                        <div className={`text-sm md:text-base font-medium ${isTodayDate ? 'text-primary' : 'text-foreground'}`}>
+                        <div className={`text-sm md:text-base font-medium ${isTodayDate ? 'text-primary' : 'text-black'}`}>
                           {format(date, 'd')}
                         </div>
 
@@ -112,10 +112,10 @@ export function DesktopCalendarView({
                                   ${snapshot.isDragging ? 'opacity-50' : ''}
                                 `}
                               >
-                                <div className="text-xs font-bold text-foreground">
+                                <div className="text-xs font-bold text-black">
                                   {assignment.person}
                                 </div>
-                                <div className="text-xs font-medium text-foreground mt-0.5">
+                                <div className="text-xs font-medium text-black mt-0.5">
                                   {cleaningTypeLabels[assignment.type]}
                                 </div>
 

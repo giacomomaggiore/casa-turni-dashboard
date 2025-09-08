@@ -1,13 +1,8 @@
 import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Palette, Users } from 'lucide-react';
+import { cleaningTypeColors, cleaningTypeLabels, people, personColors } from '@/contexts/CleaningContext';
 
-const cleaningTypes = [
-  { type: 'kitchen', label: 'KITCHEN', color: 'bg-cleaning-kitchen' },
-  { type: 'bathroom', label: 'BATHROOM', color: 'bg-cleaning-bathroom' },
-];
-
-const people = ['Giacomo', 'Marco', 'Franci'];
 
 export function CleaningLegend() {
   return (
@@ -21,10 +16,10 @@ export function CleaningLegend() {
         </CardHeader>
         <CardContent>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-            {cleaningTypes.map((item) => (
-              <div key={item.type} className="flex items-center gap-2">
-                <div className={`w-4 h-4 rounded ${item.color}`} />
-                <span className="text-sm font-medium">{item.label}</span>
+            {Object.entries(cleaningTypeColors).map(([type, color]) => (
+              <div key={type} className="flex items-center gap-2">
+                <div className={`w-4 h-4 rounded ${color}`} />
+                <span className="text-sm font-medium">{cleaningTypeLabels[type as keyof typeof cleaningTypeLabels]}</span>
               </div>
             ))}
           </div>
@@ -42,8 +37,8 @@ export function CleaningLegend() {
           <div className="grid grid-cols-2 gap-2">
             {people.map((person) => (
               <div key={person} className="flex items-center gap-2">
-                <div className="w-4 h-4 rounded-full bg-primary" />
-                <span className="text-sm font-medium">{person}</span>
+                <div className={`w-4 h-4 rounded-full ${personColors[person]}`} />
+                <span className="text-sm font-medium text-black">{person}</span>
               </div>
             ))}
           </div>

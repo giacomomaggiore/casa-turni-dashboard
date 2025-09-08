@@ -5,7 +5,7 @@ import { DragDropContext, Droppable, Draggable, DropResult } from '@hello-pangea
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { ChevronLeft, ChevronRight, Edit, Trash2, Plus } from 'lucide-react';
-import { CleaningAssignment, cleaningTypeLabels, cleaningTypeColors } from '@/contexts/CleaningContext';
+import { CleaningAssignment, cleaningTypeLabels, personColors } from '@/contexts/CleaningContext';
 
 interface MobileCalendarViewProps {
   currentDate: Date;
@@ -94,10 +94,10 @@ export function MobileCalendarView({
                         p-2 rounded-lg flex items-center gap-3 transition-all
                         ${isTodayDate ? 'ring-1 ring-primary' : ''}
                         ${snapshot.isDraggingOver ? 'bg-primary/10' : ''}
-                        ${assignment ? cleaningTypeColors[assignment.type] : 'bg-muted/30'}
+                        ${assignment ? personColors[assignment.person] : 'bg-muted/30'}
                       `}
                     >
-                      <div className={`flex-none text-center w-10 ${isTodayDate ? 'text-primary' : ''}`}>
+                      <div className={`flex-none text-center w-10 ${isTodayDate ? 'text-primary' : 'text-black'}`}>
                         <div className="text-xs font-semibold">{format(day, 'eee', { locale: it })}</div>
                         <div className="text-lg font-bold">{format(day, 'd')}</div>
                       </div>
@@ -110,12 +110,12 @@ export function MobileCalendarView({
                                 {...provided.draggableProps}
                                 {...provided.dragHandleProps}
                                 className={`
-                                  w-full p-2 rounded-md shadow-sm text-center group cursor-move bg-background/80
+                                  w-full p-2 rounded-md shadow-sm text-center group cursor-move
                                   ${snapshot.isDragging ? 'opacity-60' : ''}
                                 `}
                               >
-                                <div className="font-bold text-sm">{assignment.person}</div>
-                                <div className="text-xs">{cleaningTypeLabels[assignment.type]}</div>
+                                <div className="font-bold text-sm text-black">{assignment.person}</div>
+                                <div className="text-xs text-black">{cleaningTypeLabels[assignment.type]}</div>
                                 <div className="absolute top-1 right-1 opacity-0 group-hover:opacity-100 flex gap-1">
                                    <Button
                                     variant="ghost"

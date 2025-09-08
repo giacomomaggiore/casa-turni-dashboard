@@ -47,9 +47,12 @@ export default {
           DEFAULT: "hsl(var(--card))",
           foreground: "hsl(var(--card-foreground))",
         },
-        cleaning: {
-          kitchen: "hsl(var(--cleaning-kitchen))",
-          bathroom: "hsl(var(--cleaning-bathroom))",
+        app: {
+          kitchen: "hsl(var(--app-kitchen))",
+          bathroom: "hsl(var(--app-bathroom))",
+          "person-giacomo": "hsl(var(--app-person-giacomo))",
+          "person-franci": "hsl(var(--app-person-franci))",
+          "person-marco": "hsl(var(--app-person-marco))",
         },
         sidebar: {
           DEFAULT: "hsl(var(--sidebar-background))",
