@@ -89,10 +89,9 @@ export function DesktopCalendarView({
                       {...provided.droppableProps}
                       className={`
                         h-24 lg:h-28 border rounded-lg p-2 transition-all duration-200 relative
-                        ${isCurrentMonth ? 'bg-card' : 'bg-muted/20'}
                         ${isTodayDate ? 'ring-2 ring-primary ring-offset-2' : ''}
                         ${snapshot.isDraggingOver ? 'bg-primary/10 border-primary' : ''}
-                        ${assignment ? personColors[assignment.person] : ''}
+                        ${assignment ? personColors[assignment.person] : (isCurrentMonth ? 'bg-card' : 'bg-muted/20')}
                       `}
                     >
                       <div className="flex flex-col h-full">
