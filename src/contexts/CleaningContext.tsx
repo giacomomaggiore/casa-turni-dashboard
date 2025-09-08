@@ -37,9 +37,9 @@ export const cleaningTypeColors: Record<CleaningType, string> = {
 };
 
 export const personColors: Record<string, string> = {
-  Giacomo: 'bg-app-person-giacomo',
-  Marco: 'bg-app-person-marco',
-  Franci: 'bg-app-person-franci',
+  Giacomo: 'bg-[#E4C1F9]',
+  Marco: 'bg-[#D0F4DE]',
+  Franci: 'bg-[#A9DEF9]',
 };
 
 const cleaningReducer = (state: CleaningState, action: CleaningAction): CleaningState => {

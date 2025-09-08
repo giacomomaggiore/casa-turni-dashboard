@@ -3,11 +3,6 @@ import type { Config } from "tailwindcss";
 export default {
   darkMode: ["class"],
   content: ["./pages/**/*.{ts,tsx}", "./components/**/*.{ts,tsx}", "./app/**/*.{ts,tsx}", "./src/**/*.{ts,tsx}"],
-  safelist: [
-    'bg-app-person-giacomo',
-    'bg-app-person-marco',
-    'bg-app-person-franci',
-  ],
   prefix: "",
   theme: {
     container: {
@@ -55,9 +50,6 @@ export default {
         app: {
           kitchen: "hsl(var(--app-kitchen))",
           bathroom: "hsl(var(--app-bathroom))",
-          "person-giacomo": "hsl(var(--app-person-giacomo))",
-          "person-franci": "hsl(var(--app-person-franci))",
-          "person-marco": "hsl(var(--app-person-marco))",
         },
         sidebar: {
           DEFAULT: "hsl(var(--sidebar-background))",
