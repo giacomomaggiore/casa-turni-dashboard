@@ -15,7 +15,7 @@ const Index = () => {
               Zurlindenstrasse 3
             </h1>
             <p className="text-center text-muted-foreground mt-2">
-              Made with ❤️ by <a href='https://jules.google/>' target='blank'> Jules </a>,<a href='https://www.linkedin.com/in/denegrimarco?originalSubdomain=it' target='blank'> Marco</a> & <a href='https://giacomomaggiore.com/' target='blank'>Giacomo</a>
+              Made with ❤️ by <a href='https://jules.google/>' target='blank'> Jules</a>,<a href='https://www.linkedin.com/in/denegrimarco?originalSubdomain=it' target='blank'> Marco</a> & <a href='https://giacomomaggiore.com/' target='blank'>Giacomo</a>
             </p>
           </div>
         </header>
