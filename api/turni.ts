@@ -20,6 +20,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       const { url } = await put(FILENAME, JSON.stringify(assignments, null, 2), {
         access: 'public',
         contentType: 'application/json',
+        cacheControlMaxAge: 0,
       });
 
       return res.status(200).json({ message: 'Assignments saved successfully.', url });
