@@ -55,46 +55,6 @@ export function DashboardSidebar({ currentDate }: DashboardSidebarProps) {
 
   return (
     <div className="space-y-6">
-      {/* Legend */}
-      <Card>
-        <CardHeader className="pb-3">
-          <CardTitle className="flex items-center gap-2 text-lg">
-            <Palette className="h-5 w-5 text-primary" />
-            Legenda
-          </CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          <div>
-            <h4 className="font-medium mb-2 flex items-center gap-2">
-              <Users className="h-4 w-4" />
-              Persone
-            </h4>
-            <div className="space-y-1">
-              {people.map((person) => (
-                <div key={person} className="flex items-center gap-2 text-sm">
-                  <div className="w-3 h-3 rounded-full bg-primary" />
-                  {person}
-                </div>
-              ))}
-            </div>
-          </div>
-          
-          <Separator />
-          
-          <div>
-            <h4 className="font-medium mb-2">Tipi di Pulizia</h4>
-            <div className="space-y-1">
-              {cleaningTypes.map((type) => (
-                <div key={type} className="flex items-center gap-2 text-sm">
-                  <div className={`w-3 h-3 rounded ${cleaningTypeColors[type]}`} />
-                  {cleaningTypeLabels[type]}
-                </div>
-              ))}
-            </div>
-          </div>
-        </CardContent>
-      </Card>
-
       {/* Statistics */}
       <Card>
         <CardHeader className="pb-3">
@@ -171,20 +131,6 @@ export function DashboardSidebar({ currentDate }: DashboardSidebarProps) {
           </div>
         </CardContent>
       </Card>
-
-      {/* Instructions - Hidden on mobile */}
-      <div className="hidden lg:block">
-        <Card>
-          <CardHeader className="pb-3">
-            <CardTitle className="text-lg">Come usare (Desktop)</CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-2 text-sm text-muted-foreground">
-            <p>• <strong>Trascina</strong> un turno per spostarlo di data.</p>
-            <p>• <strong>Passa il mouse</strong> su un turno per vedere le opzioni di modifica ed eliminazione.</p>
-            <p>• <strong>Clicca il +</strong> su un giorno vuoto per aggiungere un nuovo turno.</p>
-          </CardContent>
-        </Card>
-      </div>
     </div>
   );
 } 
