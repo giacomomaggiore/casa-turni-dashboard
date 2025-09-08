@@ -124,10 +124,10 @@ const generateDefaultAssignments = (): CleaningAssignment[] => {
 
 interface CleaningContextType {
   assignments: CleaningAssignment[];
-  addAssignment: (assignment: Omit<CleaningAssignment, 'id'>) => void;
-  updateAssignment: (assignment: CleaningAssignment) => void;
+  addAssignment: (assignment: Omit<CleaningAssignment, 'id'>) => Promise<void>;
+  updateAssignment: (assignment: CleaningAssignment) => Promise<void>;
   deleteAssignment: (id:string) => void;
-  moveAssignment: (id: string, newDate: string) => void;
+  moveAssignment: (id: string, newDate: string) => Promise<void>;
   resetToDefault: () => void;
   getAssignmentsForDate: (date: string) => CleaningAssignment[];
 }
@@ -203,20 +203,65 @@ export const CleaningProvider: React.FC<CleaningProviderProps> = ({ children }) 
     saveAssignments();
   }, [state.assignments, isInitialLoad]);
 
-  const addAssignment = (assignment: Omit<CleaningAssignment, 'id'>) => {
+  const addAssignment = async (assignment: Omit<CleaningAssignment, 'id'>) => {
     dispatch({ type: 'ADD_ASSIGNMENT', payload: assignment });
+    try {
+      await fetch('/api/notify', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          title: 'New Shift Added',
+          body: `${assignment.person} has been assigned to ${assignment.type} on ${assignment.date}`,
+        }),
+      });
+    } catch (error) {
+      console.error('Failed to send notification:', error);
+    }
   };
 
-  const updateAssignment = (assignment: CleaningAssignment) => {
+  const updateAssignment = async (assignment: CleaningAssignment) => {
     dispatch({ type: 'UPDATE_ASSIGNMENT', payload: assignment });
+    try {
+      await fetch('/api/notify', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          title: 'Shift Updated',
+          body: `The shift for ${assignment.date} has been updated.`,
+        }),
+      });
+    } catch (error) {
+      console.error('Failed to send notification:', error);
+    }
   };
 
   const deleteAssignment = (id: string) => {
     dispatch({ type: 'DELETE_ASSIGNMENT', payload: id });
   };
 
-  const moveAssignment = (id: string, newDate: string) => {
+  const moveAssignment = async (id: string, newDate: string) => {
     dispatch({ type: 'MOVE_ASSIGNMENT', payload: { id, newDate } });
+    const assignment = state.assignments.find(a => a.id === id);
+    if (assignment) {
+      try {
+        await fetch('/api/notify', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            title: 'Shift Moved',
+            body: `${assignment.person}'s ${assignment.type} shift has been moved to ${newDate}`,
+          }),
+        });
+      } catch (error) {
+        console.error('Failed to send notification:', error);
+      }
+    }
   };
 
   const resetToDefault = () => {
