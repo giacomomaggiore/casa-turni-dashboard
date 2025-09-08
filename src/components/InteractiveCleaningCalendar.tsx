@@ -86,8 +86,9 @@ export function InteractiveCleaningCalendar({ onDateChange }: InteractiveCleanin
           onPreviousMonth={previousMonth}
           onNextMonth={nextMonth}
           onEditAssignment={handleEditAssignment}
-          onDeleteAssignment={handleDeleteAssignment}
+  onDeleteAssignment={handleDeleteAssignment}
           onAddAssignment={handleAddAssignment}
+          onMoveAssignment={moveAssignment}
         />
       ) : (
         <DesktopCalendarView
